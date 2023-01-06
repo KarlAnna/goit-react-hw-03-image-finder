@@ -13,33 +13,44 @@ class App extends Component {
 
   state = {
     imgs: null,
-    isLoading: false
+    totalImgs: null,
+    isLoading: false,
+    page: 1,
+    query: ''
   }
 
-  searchImgs = async q => {
-    if (q.length === 0) {
+  searchImgs = async query => {
+    if (query.length === 0) {
       return Notify.failure('Please enter something')
     }
-    this.setState({ isLoading: true })
+    await this.setState({ isLoading: true, query, page: 1 })
     
-    fetchImgs(q).then(imgs => {
-      this.setState({ isLoading: false })
-      if (imgs.length === 0) {
+    fetchImgs(query, this.state.page).then(data => {
+      this.setState({ isLoading: false, totalImgs: data.totalHits })
+      if (data.hits.length === 0) {
         return Notify.failure('Sorry, there are no images matching your search query. Please try again.')
       }
-      this.setState({ imgs })
+      this.setState({ imgs: data.hits, page: this.state.page + 1 })
+    })
+  }
+
+  onLoadMore = () => {
+    this.setState({ isLoading: true })
+    fetchImgs(this.state.query, this.state.page).then(data => {
+      this.setState({ isLoading: false, imgs: [...this.state.imgs, ...data.hits], page: this.state.page + 1 })
     })
   }
 
   render() {
+    const {imgs, isLoading, totalImgs} = this.state
     return (
       <div className="app">
         <Searchbar onSubmit={this.searchImgs} />
-        {this.state.isLoading && <Loader />}
-        {this.state.imgs !== null ?
+        {isLoading && <Loader />}
+        {imgs !== null ?
           (<>
-            <ImageGallary imgs={this.state.imgs} />
-            <Button onClick={this.onLoadMore} />
+            <ImageGallary imgs={imgs} />
+            {imgs.length !== totalImgs && <Button onClick={this.onLoadMore} />}
           </>)
           : null}
       </div>
