@@ -1,4 +1,3 @@
-// import { Component } from "react";
 import axios from 'axios';
 
 export const fetchImgs = async (q, page) => {

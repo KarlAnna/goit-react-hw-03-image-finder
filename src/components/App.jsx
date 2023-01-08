@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-// import axios from 'axios';
 
 import Searchbar from './Searchbar/Searchbar'
 import Loader from "./Loader/Loader";
 import {fetchImgs} from './services/api'
 import ImageGallary from './ImageGallery/ImageGallery'
 import Button from "./Button/Button";
+import Modal from "./Modal/Modal";
 import '../styles.css'
 
 class App extends Component {
@@ -15,8 +15,10 @@ class App extends Component {
     imgs: null,
     totalImgs: null,
     isLoading: false,
+    showModal: false,
     page: 1,
-    query: ''
+    query: '',
+    largeImageURL: ''
   }
 
   searchImgs = async query => {
@@ -26,33 +28,47 @@ class App extends Component {
     await this.setState({ isLoading: true, query, page: 1 })
     
     fetchImgs(query, this.state.page).then(data => {
-      this.setState({ isLoading: false, totalImgs: data.totalHits })
-      if (data.hits.length === 0) {
+      const { hits, totalHits } = data
+      this.setState({ isLoading: false, totalImgs: totalHits })
+      if (hits.length === 0) {
         return Notify.failure('Sorry, there are no images matching your search query. Please try again.')
       }
-      this.setState({ imgs: data.hits, page: this.state.page + 1 })
+      this.setState({ imgs: hits, page: this.state.page + 1 })
     })
   }
 
   onLoadMore = () => {
+    const { query, page, imgs } = this.state
+    
     this.setState({ isLoading: true })
-    fetchImgs(this.state.query, this.state.page).then(data => {
-      this.setState({ isLoading: false, imgs: [...this.state.imgs, ...data.hits], page: this.state.page + 1 })
+    fetchImgs(query, page).then(data => {
+      this.setState({ isLoading: false, imgs: [...imgs, ...data.hits], page: page + 1 })
     })
   }
 
+  toggleModal = () => {
+    this.setState({showModal: !this.state.showModal})
+  }
+
+  getlargeImageURL = largeImageURL => {
+    this.setState({largeImageURL})
+  }
+
   render() {
-    const {imgs, isLoading, totalImgs} = this.state
+    const { imgs, isLoading, totalImgs, showModal, largeImageURL } = this.state
+    const {toggleModal, searchImgs, getlargeImageURL, onLoadMore} = this
+    
     return (
       <div className="app">
-        <Searchbar onSubmit={this.searchImgs} />
+        {showModal && <Modal imgUrl={largeImageURL} toggleModal={toggleModal} />}
+        <Searchbar onSubmit={searchImgs} />
         {isLoading && <Loader />}
         {imgs !== null ?
           (<>
-            <ImageGallary imgs={imgs} />
-            {imgs.length !== totalImgs && <Button onClick={this.onLoadMore} />}
+            <ImageGallary imgs={imgs} toggleModal={toggleModal} onClick={getlargeImageURL} />
+            {imgs.length !== totalImgs && <Button onClick={onLoadMore} />}
           </>)
-          : null}
+        : null}
       </div>
     )
   }

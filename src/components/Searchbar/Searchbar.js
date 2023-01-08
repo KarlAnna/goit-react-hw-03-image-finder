@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { Component } from "react";
 import { BsSearch } from "react-icons/bs";
 import '../../styles.css'
@@ -19,16 +20,17 @@ class Searchbar extends Component {
 
 
     render() {
+        const {formSubmitHandler, handlesearchValueChange} = this
         return (
         <header className="searchbar">
-            <form onSubmit={this.formSubmitHandler} className="searchForm">
+            <form onSubmit={formSubmitHandler} className="searchForm">
                 <button type="submit" className="searchForm-button">
                     <BsSearch />
                     <span className="searchForm-button-label">Search</span>
                 </button>
 
                     <input
-                        onChange={this.handlesearchValueChange}
+                        onChange={handlesearchValueChange}
                 className="searchForm-input"
                 type="text"
                 autoComplete="off"
@@ -39,6 +41,10 @@ class Searchbar extends Component {
         </header>
     )
     }
+}
+
+Searchbar.propTypes = {
+    onSubmit: PropTypes.func
 }
 
 export default Searchbar
