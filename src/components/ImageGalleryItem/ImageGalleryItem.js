@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types';
 import '../../styles.css'
 
-const ImageGallaryItem = ({ img, onClick }) => {
-    console.log(img);
+const ImageGallaryItem = ({ webformatURL, largeImageURL, tags, onClick, toggleModal }) => {
     return (
-        // <li className="imageGalleryItem" onClick={toggleModal}>
-            <img className="imageGalleryItem-image" src={img.webformatURL} alt={img.tags} onClick={() => onClick(img.largeImageURL)} />
-        // </li>
+        <li className="imageGalleryItem" onClick={toggleModal}>
+            <img className="imageGalleryItem-image" src={webformatURL} alt={tags} onClick={() => onClick(largeImageURL)} />
+        </li>
     )
 }
 

@@ -6,9 +6,16 @@ const ImageGallary = ({ imgs, toggleModal, onClick }) => {
     return (
         <ul className="imageGallery">
             {imgs.map((img) => 
-                <li key={img.id} className="imageGalleryItem" onClick={toggleModal}>
-                    <ImageGallaryItem img={img} onClick={onClick} />
-                </li>
+                // <li key={img.id} className="imageGalleryItem" onClick={toggleModal}>
+                <ImageGallaryItem 
+                    key={img.id}
+                    webformatURL={img.webformatURL} 
+                    largeImageURL={img.largeImageURL} 
+                    tags={img.tags}
+                    onClick={onClick} 
+                    toggleModal={toggleModal}
+                />
+                // </li>
             )}
         </ul>
     )
